@@ -1,5 +1,5 @@
 {
-  "_comment": "DRAFT — pulled from an automated fetch of https://www.bmg.org.uk/become-a-guide/prerequisites/ summarised by a small model. Every 'verified' field is false. Read the live page yourself, correct min_count/min_grade/extra_constraint values, flip 'verified' to true per rule, THEN hand this file to Fable for Phase 2. Do not seed the app from this file unverified.",
+  "_comment": "DRAFT — cross-checked via two independent fetches of https://www.bmg.org.uk/become-a-guide/prerequisites/ (2026-07-12), the second asking for verbatim quotes only. Numbers below were consistent across both passes EXCEPT one alpine sub-rule from the first pass ('5 routes must be 800m+ mixed') which did NOT reappear on the verbatim pass and has been removed as likely fabricated — a concrete example of why every 'verified' field here is still false. Read the live page yourself, correct anything wrong (see 'alpine areas' note below in particular), flip 'verified' to true per rule, THEN hand this file to Fable for Phase 2. Do not seed the app from this file unverified.",
   "categories": [
     {
       "key": "rock",
@@ -50,12 +50,12 @@
       "label": "Alpine Mountaineering",
       "rules": [
         {
-          "description": "Alpine routes, PD or harder, over a minimum span of years",
-          "min_grade": "PD",
+          "description": "Ascents of major alpine summits, over a minimum span of years",
+          "min_grade": null,
           "min_count": 20,
           "extra_constraint": { "min_years_span": 4, "min_distinct_areas": 3 },
           "verified": false,
-          "source_note": "CONFIRM year span and distinct-areas figures — these looked like plausible but unconfirmed extras"
+          "source_note": "\"Twenty ascents of major summits ... over a minimum period of at least four years\" and \"at least three\" Alpine areas — consistent across both fetches, still CONFIRM wording on live page"
         },
         {
           "description": "Of the above, at TD or harder",
@@ -63,15 +63,7 @@
           "min_count": 10,
           "extra_constraint": {},
           "verified": false,
-          "source_note": "\"ten of which must be TD or harder\" — CONFIRM"
-        },
-        {
-          "description": "Of the TD+ routes, 800m+ mixed routes",
-          "min_grade": "TD",
-          "min_count": 5,
-          "extra_constraint": { "min_length_m": 800, "route_type": "mixed" },
-          "verified": false,
-          "source_note": "CONFIRM this sub-condition exists at all on the live page — highest-risk fabricated detail"
+          "source_note": "\"ten of which must be TD or harder\" — consistent across both fetches, still CONFIRM"
         }
       ]
     },
