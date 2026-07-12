@@ -1,0 +1,22 @@
+import { z } from "zod";
+import { AscentStyle, Discipline } from "@/generated/prisma/enums";
+
+export const climbInputSchema = z.object({
+  routeName: z
+    .string()
+    .trim()
+    .min(1, "Route name is required")
+    .max(200, "Route name is too long"),
+  discipline: z.enum(Discipline, { error: "Pick a discipline" }),
+  date: z.iso.date({ error: "Pick a date" }),
+  gradeRaw: z
+    .string()
+    .trim()
+    .min(1, "Grade is required")
+    .max(50, "Grade is too long"),
+  ascentStyle: z.enum(AscentStyle, { error: "Pick an ascent style" }),
+  area: z.string().trim().max(120, "Area name is too long").optional(),
+  notes: z.string().trim().max(2000, "Notes are too long").optional(),
+});
+
+export type ClimbInput = z.infer<typeof climbInputSchema>;

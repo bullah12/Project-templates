@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
@@ -26,11 +27,12 @@ export default async function DashboardPage() {
         <CardHeader>
           <CardTitle>Dashboard — coming soon</CardTitle>
           <CardDescription>
-            Signed in as {user.email}. The climb logbook and BMG progress
-            tracker arrive in later phases.
+            Signed in as {user.email}. The BMG progress tracker arrives in a
+            later phase — your logbook is ready now.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex gap-3">
+          <Button render={<Link href="/logbook" />}>Open logbook</Button>
           <form action={signOut}>
             <Button type="submit" variant="outline">
               Sign out

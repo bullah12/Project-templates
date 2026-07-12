@@ -19,15 +19,17 @@ roadmap — this repo currently contains the **Phase 0 scaffold**.
    - `DATABASE_URL` — pooled Postgres connection string (port 6543)
    - `DIRECT_URL` — direct connection string (port 5432, used by Prisma Migrate; optional)
    - `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — from Project Settings → API
-3. Install and run:
+3. Install, migrate, and run:
 
 ```bash
-npm install       # also runs `prisma generate`
+npm install                 # also runs `prisma generate`
+npx prisma migrate deploy   # applies prisma/migrations to your database
 npm run dev
 ```
 
-Open <http://localhost:3000>. Sign up, confirm your email, and you should
-land on the (placeholder) dashboard at `/dashboard`.
+Open <http://localhost:3000>. Sign up, confirm your email, and you land on
+the dashboard — from there, open the logbook at `/logbook` to start logging
+climbs.
 
 ## Scripts
 
@@ -42,14 +44,18 @@ land on the (placeholder) dashboard at `/dashboard`.
 ## Project layout
 
 - `src/app/` — App Router pages: landing, `(auth)/sign-in`, `(auth)/sign-up`,
-  `auth/callback` + `auth/confirm` (email confirmation handlers), `dashboard`
-  (placeholder, requires a session)
-- `src/proxy.ts` — Supabase session refresh + `/dashboard` gating
-  (Next.js 16 proxy, formerly middleware)
+  `auth/callback` + `auth/confirm` (email confirmation handlers), `dashboard`,
+  and `logbook` (list / new / edit, with server actions in
+  `logbook/actions.ts`)
+- `src/proxy.ts` — Supabase session refresh + auth gating for `/dashboard`
+  and `/logbook` (Next.js 16 proxy, formerly middleware)
 - `src/lib/supabase/` — browser/server Supabase clients
+- `src/lib/auth.ts` — `requireUser()`: session → `User` row (upserted on
+  first visit); every logbook query is scoped by `user_id`
 - `src/lib/prisma.ts` — Prisma client singleton (pg driver adapter)
-- `prisma/schema.prisma` + `prisma.config.ts` — schema (no models yet —
-  Phase 1) and CLI config; connection comes from `DATABASE_URL`
+- `prisma/schema.prisma` + `prisma.config.ts` — `User`/`Climb`/`Area` models
+  and CLI config; connection comes from `DATABASE_URL`; migrations in
+  `prisma/migrations/`
 - `.github/workflows/ci.yml` — typecheck + lint on push/PR
 
 ## Deploying to Vercel

@@ -1,7 +1,10 @@
 // Ascent Ledger — Prisma schema
 //
-// Phase 0: datasource + generator only. Data models (User, Climb, Area, …)
-// arrive in Phase 1+ per docs/PLAN.md §7.
+// Phase 1: User, Climb, Area per docs/PLAN.md §3. Notes:
+// - grade_normalised_score / grade_system are nullable and unused until the
+//   grade engine lands (Phase 2); grades are stored as free text (grade_raw).
+// - No Route model yet (Phase 3), so Climb has no route_id — the route is
+//   free_text_route_name only.
 //
 // Connection URLs live in prisma.config.ts (Prisma 7+), sourced from the
 // DATABASE_URL environment variable — never hardcoded here.
@@ -13,4 +16,93 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Discipline {
+  rock
+  winter
+  alpine
+  ski_touring
+}
+
+enum GradeSystem {
+  uk_trad
+  french_sport
+  uiaa
+  scottish_winter
+  wi_ice
+  alpine_overall
+  ski_touring_scale
+}
+
+enum AscentStyle {
+  led
+  alternate_lead
+  seconded
+  solo
+  roped_solo
+}
+
+enum ClimbSource {
+  manual
+  csv_import
+  ukc_import
+}
+
+// Mirrors the Supabase Auth user; id is the Supabase auth.users UUID.
+// Upserted on first authenticated visit to the logbook.
+model User {
+  id          String   @id @db.Uuid
+  email       String   @unique
+  displayName String?  @map("display_name")
+  homeRegion  String?  @map("home_region")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  climbs Climb[]
+
+  @@map("users")
+}
+
+// Crag / mountain / massif. Phase 1 only sets name (find-or-create from the
+// free-text area field); region/country/coords/tags fill in from Phase 3.
+model Area {
+  id             String       @id @default(uuid()) @db.Uuid
+  name           String       @unique
+  region         String?
+  country        String?
+  lat            Float?
+  lng            Float?
+  disciplineTags Discipline[] @map("discipline_tags")
+
+  climbs Climb[]
+
+  @@map("areas")
+}
+
+// A single logged ascent.
+model Climb {
+  id                   String       @id @default(uuid()) @db.Uuid
+  userId               String       @map("user_id") @db.Uuid
+  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  freeTextRouteName    String       @map("free_text_route_name")
+  discipline           Discipline
+  date                 DateTime     @db.Date
+  gradeSystem          GradeSystem? @map("grade_system")
+  gradeRaw             String       @map("grade_raw")
+  gradeNormalisedScore Int?         @map("grade_normalised_score")
+  ascentStyle          AscentStyle  @map("ascent_style")
+  pitches              Int?
+  lengthM              Int?         @map("length_m")
+  areaId               String?      @map("area_id") @db.Uuid
+  area                 Area?        @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  partners             String[]
+  notes                String?
+  photoUrls            String[]     @map("photo_urls")
+  gpxTrackUrl          String?      @map("gpx_track_url")
+  source               ClimbSource  @default(manual)
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+
+  @@index([userId, date])
+  @@map("climbs")
 }
